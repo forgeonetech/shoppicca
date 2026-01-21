@@ -1,6 +1,85 @@
 'use client';
 
+import { useState } from 'react';
+import Link from 'next/link';
+
 export default function Contact() {
+    const [formData, setFormData] = useState({
+        name: '',
+        email: '',
+        subject: '',
+        message: ''
+    });
+    const [isSubmitting, setIsSubmitting] = useState(false);
+    const [submitStatus, setSubmitStatus] = useState({ type: '', message: '' });
+
+    const handleChange = (e:any) => {
+        const { id, value } = e.target;
+        setFormData(prev => ({
+            ...prev,
+            [id]: value
+        }));
+    };
+
+    const handleSubmit = async (e:any) => {
+        e.preventDefault();
+        setIsSubmitting(true);
+        setSubmitStatus({ type: '', message: '' });
+
+        try {
+            // Format the message for SMS
+            const smsMessage = `NEW CONTACT FORM SUBMISSION
+
+Name: ${formData.name}
+Email: ${formData.email}
+Subject: ${formData.subject}
+
+Message:
+${formData.message}`;
+
+            // Make API call to your backend endpoint
+            const response = await fetch('/api/send-sms', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    name: formData.name,
+                    email: formData.email,
+                    subject: formData.subject,
+                    message: formData.message,
+                    smsMessage: smsMessage
+                }),
+            });
+
+            const data = await response.json();
+
+            if (response.ok) {
+                setSubmitStatus({
+                    type: 'success',
+                    message: 'Thank you! Your message has been sent successfully.'
+                });
+                // Reset form
+                setFormData({
+                    name: '',
+                    email: '',
+                    subject: '',
+                    message: ''
+                });
+            } else {
+                throw new Error(data.error || 'Failed to send message');
+            }
+        } catch (error) {
+            setSubmitStatus({
+                type: 'error',
+                message: 'Sorry, there was an error sending your message. Please try again.'
+            });
+            console.error('Error:', error);
+        } finally {
+            setIsSubmitting(false);
+        }
+    };
+
     return (
         <section className="contact" id="contact">
             <div className="container">
@@ -22,8 +101,10 @@ export default function Contact() {
                                     </svg>
                                 </div>
                                 <div>
+                                  <Link href="mailto:forgeonetech@gmail.com">
                                     <h4 className="method-title">Email Us</h4>
-                                    <p className="method-value">support@shoppicca.com</p>
+                                    <p className="method-value">forgeonetech@gmail.com</p>
+                                  </Link>
                                 </div>
                             </div>
 
@@ -34,8 +115,10 @@ export default function Contact() {
                                     </svg>
                                 </div>
                                 <div>
+                                  <Link href="https://wa.me/233249497164">
                                     <h4 className="method-title">WhatsApp</h4>
-                                    <p className="method-value">+233 XX XXX XXXX</p>
+                                    <p className="method-value">+233 24 949 7164</p>
+                                  </Link>
                                 </div>
                             </div>
 
@@ -48,14 +131,14 @@ export default function Contact() {
                                 </div>
                                 <div>
                                     <h4 className="method-title">Business Hours</h4>
-                                    <p className="method-value">Mon - Fri: 9AM - 6PM GMT</p>
+                                    <p className="method-value">Mon - Fri: 8AM - 6PM GMT</p>
                                 </div>
                             </div>
                         </div>
                     </div>
 
                     <div className="contact-form-wrapper">
-                        <form className="contact-form">
+                        <div className="contact-form">
                             <div className="form-group">
                                 <label className="label" htmlFor="name">Full Name</label>
                                 <input
@@ -63,6 +146,9 @@ export default function Contact() {
                                     id="name"
                                     className="input"
                                     placeholder="Enter your name"
+                                    value={formData.name}
+                                    onChange={handleChange}
+                                    required
                                 />
                             </div>
 
@@ -73,6 +159,9 @@ export default function Contact() {
                                     id="email"
                                     className="input"
                                     placeholder="Enter your email"
+                                    value={formData.email}
+                                    onChange={handleChange}
+                                    required
                                 />
                             </div>
 
@@ -83,6 +172,9 @@ export default function Contact() {
                                     id="subject"
                                     className="input"
                                     placeholder="How can we help?"
+                                    value={formData.subject}
+                                    onChange={handleChange}
+                                    required
                                 />
                             </div>
 
@@ -93,13 +185,26 @@ export default function Contact() {
                                     className="input textarea"
                                     placeholder="Type your message here..."
                                     rows={4}
+                                    value={formData.message}
+                                    onChange={handleChange}
+                                    required
                                 />
                             </div>
 
-                            <button type="submit" className="btn btn-primary btn-lg submit-btn">
-                                Send Message
+                            {submitStatus.message && (
+                                <div className={`status-message ${submitStatus.type}`}>
+                                    {submitStatus.message}
+                                </div>
+                            )}
+
+                            <button 
+                                onClick={handleSubmit}
+                                className="btn btn-primary btn-lg submit-btn"
+                                disabled={isSubmitting}
+                            >
+                                {isSubmitting ? 'Sending...' : 'Send Message'}
                             </button>
-                        </form>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -210,6 +315,30 @@ export default function Contact() {
         .submit-btn {
           width: 100%;
           margin-top: 0.5rem;
+        }
+
+        .submit-btn:disabled {
+          opacity: 0.6;
+          cursor: not-allowed;
+        }
+
+        .status-message {
+          padding: 1rem;
+          border-radius: 0.5rem;
+          margin-bottom: 1rem;
+          font-size: 0.875rem;
+        }
+
+        .status-message.success {
+          background: #d1fae5;
+          color: #065f46;
+          border: 1px solid #6ee7b7;
+        }
+
+        .status-message.error {
+          background: #fee2e2;
+          color: #991b1b;
+          border: 1px solid #fca5a5;
         }
       `}</style>
         </section>

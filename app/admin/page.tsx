@@ -24,7 +24,7 @@ export default function AdminDashboard() {
         .from('stores')
         .select('*')
         .eq('owner_id', user.id)
-        .single();
+        .maybeSingle();
 
       if (storeData) {
         setStore(storeData);
@@ -221,71 +221,92 @@ export default function AdminDashboard() {
         }
 
         .dashboard-header h1 {
-          font-size: 1.75rem;
+          font-size: 1.875rem;
           font-weight: 700;
           margin-bottom: 0.5rem;
+          color: var(--color-text-primary);
+          letter-spacing: -0.02em;
         }
 
         .dashboard-header p {
           color: var(--color-text-secondary);
+          font-size: 0.9375rem;
         }
 
         .stats-grid {
           display: grid;
           grid-template-columns: repeat(2, 1fr);
           gap: 1rem;
-          margin-bottom: 2rem;
+          margin-bottom: 2.5rem;
         }
 
         @media (min-width: 768px) {
           .stats-grid {
             grid-template-columns: repeat(4, 1fr);
+            gap: 1.25rem;
           }
         }
 
         .stat-card {
           display: flex;
+          flex-direction: row;
           align-items: center;
           gap: 1rem;
           background: white;
-          padding: 1.25rem;
-          border-radius: var(--radius-lg);
-          box-shadow: var(--shadow-sm);
+          padding: 1.5rem;
+          border-radius: 12px;
+          box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.1);
+          border: 1px solid rgba(0, 0, 0, 0.05);
+          transition: all 0.2s ease;
+        }
+
+        .stat-card:hover {
+          box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
+          transform: translateY(-1px);
         }
 
         .stat-icon {
-          width: 48px;
-          height: 48px;
+          width: 52px;
+          height: 52px;
           display: flex;
           align-items: center;
           justify-content: center;
-          border-radius: var(--radius-md);
+          border-radius: 10px;
+          flex-shrink: 0;
         }
 
         .stat-content {
           display: flex;
           flex-direction: column;
+          gap: 0.125rem;
+          min-width: 0;
         }
 
         .stat-value {
-          font-size: 1.5rem;
+          font-size: 1.625rem;
           font-weight: 700;
           color: var(--color-text-primary);
+          line-height: 1.2;
+          letter-spacing: -0.01em;
         }
 
         .stat-label {
           font-size: 0.8125rem;
           color: var(--color-text-tertiary);
+          font-weight: 500;
+          line-height: 1.3;
         }
 
         .quick-actions {
-          margin-bottom: 2rem;
+          margin-bottom: 2.5rem;
         }
 
         .quick-actions h2 {
           font-size: 1.125rem;
           font-weight: 600;
-          margin-bottom: 1rem;
+          margin-bottom: 1.25rem;
+          color: var(--color-text-primary);
+          letter-spacing: -0.01em;
         }
 
         .actions-grid {
@@ -297,124 +318,180 @@ export default function AdminDashboard() {
         @media (min-width: 640px) {
           .actions-grid {
             grid-template-columns: repeat(4, 1fr);
+            gap: 1.25rem;
           }
         }
 
         .action-card {
           display: flex;
-          flex-direction: column;
+          flex-direction: row;
           align-items: center;
-          gap: 0.75rem;
-          padding: 1.5rem;
+          justify-content: flex-start;
+          gap: 0.875rem;
+          padding: 1.25rem 1.5rem;
           background: white;
-          border-radius: var(--radius-lg);
-          box-shadow: var(--shadow-sm);
+          border-radius: 12px;
+          box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.1);
+          border: 1px solid rgba(0, 0, 0, 0.05);
           text-decoration: none;
           color: var(--color-text-primary);
-          transition: all var(--transition-fast);
+          transition: all 0.2s ease;
+          position: relative;
+          overflow: hidden;
+        }
+
+        .action-card::before {
+          content: '';
+          position: absolute;
+          top: 0;
+          left: 0;
+          right: 0;
+          height: 2px;
+          background: linear-gradient(90deg, var(--color-primary), #60A5FA);
+          opacity: 0;
+          transition: opacity 0.2s ease;
         }
 
         .action-card:hover {
-          box-shadow: var(--shadow-md);
+          box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
           transform: translateY(-2px);
         }
 
+        .action-card:hover::before {
+          opacity: 1;
+        }
+
         .action-icon {
-          width: 48px;
-          height: 48px;
+          width: 44px;
+          height: 44px;
           display: flex;
           align-items: center;
           justify-content: center;
-          background: rgba(59, 130, 246, 0.1);
+          background: rgba(59, 130, 246, 0.08);
           color: var(--color-primary);
-          border-radius: 50%;
+          border-radius: 10px;
+          transition: all 0.2s ease;
+          flex-shrink: 0;
+        }
+
+        .action-card:hover .action-icon {
+          background: rgba(59, 130, 246, 0.12);
+          transform: scale(1.05);
         }
 
         .action-card span {
-          font-size: 0.875rem;
-          font-weight: 500;
+          font-size: 0.9375rem;
+          font-weight: 600;
+          letter-spacing: -0.01em;
+          white-space: nowrap;
         }
 
         .recent-products {
           background: white;
-          border-radius: var(--radius-lg);
-          padding: 1.5rem;
-          box-shadow: var(--shadow-sm);
+          border-radius: 12px;
+          padding: 1.75rem;
+          box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.1);
+          border: 1px solid rgba(0, 0, 0, 0.05);
         }
 
         .section-header {
           display: flex;
           justify-content: space-between;
           align-items: center;
-          margin-bottom: 1rem;
+          margin-bottom: 1.25rem;
         }
 
         .section-header h2 {
           font-size: 1.125rem;
           font-weight: 600;
+          color: var(--color-text-primary);
+          letter-spacing: -0.01em;
         }
 
         .view-all {
           font-size: 0.875rem;
           color: var(--color-primary);
           text-decoration: none;
+          font-weight: 500;
+          transition: color 0.2s ease;
+        }
+
+        .view-all:hover {
+          color: #2563EB;
         }
 
         .empty-state {
           text-align: center;
-          padding: 2rem;
+          padding: 3rem 2rem;
         }
 
         .empty-state p {
           color: var(--color-text-secondary);
-          margin-bottom: 1rem;
+          margin-bottom: 1.25rem;
+          font-size: 0.9375rem;
         }
 
         .products-list {
           display: flex;
           flex-direction: column;
-          gap: 0.75rem;
+          gap: 0.625rem;
         }
 
         .product-item {
           display: flex;
           justify-content: space-between;
           align-items: center;
-          padding: 0.75rem;
+          padding: 1rem 1.125rem;
           background: var(--color-background-secondary);
-          border-radius: var(--radius-md);
+          border-radius: 10px;
+          transition: all 0.2s ease;
+          border: 1px solid rgba(0, 0, 0, 0.04);
+        }
+
+        .product-item:hover {
+          background: rgba(0, 0, 0, 0.02);
+          border-color: rgba(0, 0, 0, 0.08);
         }
 
         .product-info {
           display: flex;
           flex-direction: column;
+          gap: 0.25rem;
+          min-width: 0;
+          flex: 1;
         }
 
         .product-name {
-          font-weight: 500;
+          font-weight: 600;
           color: var(--color-text-primary);
+          font-size: 0.9375rem;
+          letter-spacing: -0.01em;
         }
 
         .product-price {
           font-size: 0.8125rem;
           color: var(--color-text-tertiary);
+          font-weight: 500;
         }
 
         .visibility-badge {
           font-size: 0.6875rem;
-          font-weight: 500;
-          padding: 0.25rem 0.5rem;
-          border-radius: var(--radius-full);
+          font-weight: 600;
+          padding: 0.375rem 0.75rem;
+          border-radius: 6px;
+          letter-spacing: 0.01em;
+          text-transform: uppercase;
+          flex-shrink: 0;
         }
 
         .visibility-badge.visible {
           background: rgba(16, 185, 129, 0.1);
-          color: var(--color-success);
+          color: #059669;
         }
 
         .visibility-badge.hidden {
           background: rgba(107, 114, 128, 0.1);
-          color: var(--color-text-tertiary);
+          color: #6B7280;
         }
 
         .loading {

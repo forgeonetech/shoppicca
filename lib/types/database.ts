@@ -51,7 +51,7 @@ export interface Category {
     id: string;
     store_id: string;
     name: string;
-    image_url?: string | null;
+    category_url: string | null;
     created_at: string;
 }
 
@@ -125,7 +125,7 @@ export interface CreateProductInput {
 export interface CreateCategoryInput {
     store_id: string;
     name: string;
-    image_url?: string;
+    category_url?: string;
 }
 
 // Wishlist item for client-side state

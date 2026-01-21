@@ -14,7 +14,7 @@ export async function GET(
             .from('stores')
             .select('*, plans(*)')
             .eq('slug', slug)
-            .single();
+            .maybeSingle();
 
         if (storeError || !store) {
             return NextResponse.json(

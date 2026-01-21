@@ -34,7 +34,7 @@ export default function ProductPage() {
             .from('stores')
             .select('*')
             .eq('slug', slug)
-            .single();
+            .maybeSingle();
 
         if (!storeData) {
             setLoading(false);
@@ -48,7 +48,7 @@ export default function ProductPage() {
             .select('*, product_images(*), product_attributes(*)')
             .eq('id', productId)
             .eq('store_id', storeData.id)
-            .single();
+            .maybeSingle();
 
         if (productData) {
             setProduct(productData);
@@ -178,7 +178,7 @@ export default function ProductPage() {
         
         .page-header { display: flex; align-items: center; justify-content: space-between; padding: 1rem; border-bottom: 1px solid #E5E7EB; position: sticky; top: 0; background: white; z-index: 10; }
         .back-btn { padding: 0.5rem; color: ${themeColor}; }
-        .store-name { font-family: 'Playfair Display', serif; font-size: 1.25rem; color: ${themeColor}; text-decoration: none; }
+        .store-name { font-family: 'Dancing Script', cursive; font-size: 1.75rem; font-weight: 700; color: ${themeColor}; text-decoration: none; transform: rotate(-2deg); }
 
         main { max-width: 1200px; margin: 0 auto; }
         @media (min-width: 768px) { main { display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; padding: 2rem; } }

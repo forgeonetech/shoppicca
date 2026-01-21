@@ -30,7 +30,7 @@ export async function POST(request: NextRequest) {
             .from('plans')
             .select('*')
             .eq('id', planId)
-            .single();
+            .maybeSingle();
 
         if (!plan) {
             return NextResponse.json({ error: 'Plan not found' }, { status: 404 });
@@ -41,7 +41,7 @@ export async function POST(request: NextRequest) {
             .from('stores')
             .select('id')
             .eq('slug', slug)
-            .single();
+            .maybeSingle();
 
         if (existingStore) {
             return NextResponse.json({ error: 'Store URL already taken' }, { status: 400 });
@@ -52,7 +52,7 @@ export async function POST(request: NextRequest) {
             .from('users')
             .select('email')
             .eq('id', user.id)
-            .single();
+            .maybeSingle();
 
         if (!userData) {
             return NextResponse.json({ error: 'User not found' }, { status: 404 });

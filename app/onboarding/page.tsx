@@ -53,7 +53,7 @@ const OnboardingContent = () => {
                     .from('stores')
                     .select('slug')
                     .eq('owner_id', user.id)
-                    .single();
+                    .maybeSingle();
 
                 if (store) {
                     router.push('/admin');
@@ -102,7 +102,7 @@ const OnboardingContent = () => {
                 .from('stores')
                 .select('id')
                 .eq('slug', slug)
-                .single();
+                .maybeSingle();
 
             setSlugAvailable(!data);
         };
@@ -131,12 +131,19 @@ const OnboardingContent = () => {
             }
 
             if (authData.user) {
-                await supabase.from('users').insert({
+                const { error: userError } = await supabase.from('users').upsert({
                     id: authData.user.id,
                     full_name: fullName,
                     phone,
                     email,
                 });
+
+                if (userError) {
+                    console.error('User creation error:', userError);
+                    setError('Failed to create user record. Please try again.');
+                    return;
+                }
+
                 setUserId(authData.user.id);
                 setCurrentStep('store');
             }
@@ -183,6 +190,20 @@ const OnboardingContent = () => {
         }
 
         try {
+            // Ensure we have a user ID
+            let currentUserId = userId;
+            if (!currentUserId) {
+                const { data: { user } } = await supabase.auth.getUser();
+                if (user) {
+                    currentUserId = user.id;
+                    setUserId(user.id);
+                } else {
+                    setError('User not authenticated. Please log in.');
+                    setLoading(false);
+                    return;
+                }
+            }
+
             // For paid plan, redirect to Paystack
             if (selectedPlan.name === 'paid') {
                 // Initialize payment
@@ -212,32 +233,58 @@ const OnboardingContent = () => {
                 }
             } else {
                 // Free plan - create store directly
-                const response = await fetch('/api/store/create', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
+                // Create store
+                const { data: store, error: storeError } = await supabase
+                    .from('stores')
+                    .insert({
+                        owner_id: currentUserId,
                         name: storeName,
                         slug,
-                        category: storeCategory,
-                        description,
+                        category: storeCategory || null,
+                        description: description || null,
                         whatsapp_number: whatsappNumber,
-                        instagram_url: instagramUrl,
-                        snapchat_url: snapchatUrl,
-                        linkedin_url: linkedinUrl,
+                        instagram_url: instagramUrl || null,
+                        snapchat_url: snapchatUrl || null,
+                        linkedin_url: linkedinUrl || null,
                         plan_id: selectedPlanId,
-                    }),
-                });
+                    })
+                    .select()
+                    .single();
 
-                const data = await response.json();
-
-                if (data.error) {
-                    setError(data.error);
-                } else {
-                    setCurrentStep('complete');
+                if (storeError) {
+                    console.error('Store creation error:', storeError);
+                    // Show specific error if possible
+                    if (storeError.code === '23505') { // Unique violation
+                        setError('A store with this name or slug already exists.');
+                    } else if (storeError.code === '23503') { // FK violation
+                        setError('User record missing. Please try signing up again.');
+                    } else {
+                        setError(`Failed to create store: ${storeError.message}`);
+                    }
+                    setLoading(false);
+                    return;
                 }
+
+                // Create subscription
+                const { error: subError } = await supabase
+                    .from('subscriptions')
+                    .insert({
+                        store_id: store.id,
+                        plan_id: selectedPlanId,
+                        status: 'active',
+                        start_date: new Date().toISOString(),
+                    });
+
+                if (subError) {
+                    console.error('Subscription creation error:', subError);
+                    // Continue anyway as store is created
+                }
+
+                setCurrentStep('complete');
             }
-        } catch {
-            setError('An unexpected error occurred');
+        } catch (err: any) {
+            console.error('Unexpected error:', err);
+            setError(`An unexpected error occurred: ${err.message || err}`);
         } finally {
             setLoading(false);
         }
@@ -255,7 +302,7 @@ const OnboardingContent = () => {
         <div className="onboarding-page">
             <div className="onboarding-container">
                 <div className="onboarding-header">
-                    <Link href="/" className="logo">Shoppicca</Link>
+                    <Link href="/" className="logo" style={{ fontFamily: "'Cookie', cursive", fontWeight: 400, fontSize: '2rem', textDecoration: 'none' }}>Shoppicca</Link>
 
                     {currentStep !== 'complete' && (
                         <div className="steps">
@@ -570,7 +617,7 @@ const OnboardingContent = () => {
             .onboarding-page { min-height: 100vh; background: linear-gradient(135deg, #F8F9FA 0%, #FFFFFF 50%, #F0F7FF 100%); padding: 2rem 1rem; }
             .onboarding-container { max-width: 600px; margin: 0 auto; }
             .onboarding-header { text-align: center; margin-bottom: 2rem; }
-            .logo { font-family: var(--font-display); font-size: 1.75rem; font-weight: 700; color: var(--color-text-primary); text-decoration: none; display: block; margin-bottom: 2rem; }
+            .logo { font-family: var(--font-title); font-size: 1.75rem; font-weight: 700; color: var(--color-text-primary); text-decoration: none; display: block; margin-bottom: 2rem; }
             .steps { display: flex; justify-content: center; gap: 1rem; }
             .step { display: flex; align-items: center; gap: 0.5rem; opacity: 0.5; }
             .step.active { opacity: 1; }

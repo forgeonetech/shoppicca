@@ -10,7 +10,7 @@ interface FAQItem {
 const faqData: FAQItem[] = [
     {
         question: 'How much does it cost to create a store?',
-        answer: 'We offer a free plan that lets you get started with up to 3 categories and 5 products per category. Our paid plan at GHC 50/month gives you unlimited categories, unlimited products, custom themes, and the ability to change your store URL.',
+        answer: 'We offer a free plan that lets you get started with up to 3 categories and 10 products per category. Our paid plan at GHC 10/month gives you unlimited categories, unlimited products, custom themes, and the ability to change your store URL.',
     },
     {
         question: 'Do I need technical skills to use Shoppicca?',

@@ -46,7 +46,7 @@ export default function Footer() {
                             <li><Link href="#contact">Contact</Link></li>
                         </ul>
                     </div>
-
+                    {/* 
                     <div className="footer-links">
                         <h4 className="footer-heading">Legal</h4>
                         <ul>
@@ -55,20 +55,20 @@ export default function Footer() {
                             <li><Link href="/cookies">Cookie Policy</Link></li>
                         </ul>
                     </div>
-
+                    */}
                     <div className="footer-links">
                         <h4 className="footer-heading">Support</h4>
-                        <ul>
+                        <ul>{/*
                             <li><Link href="/help">Help Center</Link></li>
                             <li><Link href="/guides">Seller Guides</Link></li>
-                            <li><a href="mailto:support@shoppicca.com">support@shoppicca.com</a></li>
+                            */}
+                            <li><a href="mailto:forgeonetech@gmail.com">forgeonetech@gmail.com</a></li>
                         </ul>
                     </div>
                 </div>
 
                 <div className="footer-bottom">
                     <p>&copy; {new Date().getFullYear()} Shoppicca. All rights reserved.</p>
-                    <p className="footer-credit">Made with ❤️ in Ghana</p>
                 </div>
             </div>
 
@@ -100,7 +100,7 @@ export default function Footer() {
         }
 
         .footer-logo {
-          font-family: var(--font-display);
+          font-family: var(--font-title);
           font-size: 1.5rem;
           font-weight: 700;
           margin-bottom: 1rem;

@@ -78,7 +78,7 @@ export default function SignupPage() {
             <div className="auth-container">
                 <div className="auth-card">
                     <div className="auth-header">
-                        <Link href="/" className="auth-logo">Shoppicca</Link>
+                        <Link href="/" className="auth-logo" style={{ fontFamily: "'Cookie', cursive", fontWeight: 400, fontSize: '2rem', textDecoration: 'none' }}>Shoppicca</Link>
                         <h1 className="auth-title">Create Your Account</h1>
                         <p className="auth-subtitle">Start your e-commerce journey today</p>
                     </div>
@@ -208,9 +208,9 @@ export default function SignupPage() {
         }
 
         .auth-logo {
-          font-family: var(--font-display);
+          font-family: var(--font-title);
           font-size: 1.75rem;
-          font-weight: 700;
+          font-weight: 400;
           color: var(--color-text-primary);
           text-decoration: none;
           display: block;

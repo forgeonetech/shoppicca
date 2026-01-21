@@ -14,7 +14,7 @@ export default function CategoriesPage() {
     const [loading, setLoading] = useState(true);
     const [showForm, setShowForm] = useState(false);
     const [editingCategory, setEditingCategory] = useState<Category | null>(null);
-    const [formData, setFormData] = useState({ name: '', image_url: '' });
+    const [formData, setFormData] = useState({ name: '', category_url: '' });
     const [saving, setSaving] = useState(false);
     const [error, setError] = useState('');
 
@@ -30,7 +30,7 @@ export default function CategoriesPage() {
             .from('stores')
             .select('*, plans(*)')
             .eq('owner_id', user.id)
-            .single();
+            .maybeSingle();
 
         if (storeData) {
             setStore(storeData);
@@ -66,7 +66,7 @@ export default function CategoriesPage() {
                 // Update existing category
                 const { error } = await supabase
                     .from('categories')
-                    .update({ name: formData.name, image_url: formData.image_url || null })
+                    .update({ name: formData.name, category_url: formData.category_url || null })
                     .eq('id', editingCategory.id);
 
                 if (error) throw error;
@@ -77,7 +77,7 @@ export default function CategoriesPage() {
                     .insert({
                         store_id: store?.id,
                         name: formData.name,
-                        image_url: formData.image_url || null,
+                        category_url: formData.category_url || null,
                     });
 
                 if (error) throw error;
@@ -85,7 +85,7 @@ export default function CategoriesPage() {
 
             setShowForm(false);
             setEditingCategory(null);
-            setFormData({ name: '', image_url: '' });
+            setFormData({ name: '', category_url: '' });
             fetchData();
         } catch (err) {
             setError('Failed to save category');
@@ -97,7 +97,7 @@ export default function CategoriesPage() {
 
     const handleEdit = (category: Category) => {
         setEditingCategory(category);
-        setFormData({ name: category.name, image_url: category.image_url || '' });
+        setFormData({ name: category.name, category_url: category.category_url || '' });
         setShowForm(true);
     };
 
@@ -122,7 +122,7 @@ export default function CategoriesPage() {
         const fileName = `${store?.id}/${Date.now()}.${fileExt}`;
 
         const { error: uploadError } = await supabase.storage
-            .from('product_images')
+            .from('category_images')
             .upload(fileName, file);
 
         if (uploadError) {
@@ -131,10 +131,10 @@ export default function CategoriesPage() {
         }
 
         const { data: { publicUrl } } = supabase.storage
-            .from('product_images')
+            .from('category_images')
             .getPublicUrl(fileName);
 
-        setFormData({ ...formData, image_url: publicUrl });
+        setFormData({ ...formData, category_url: publicUrl });
     };
 
     const canAddCategory = plan?.category_limit === null || categories.length < (plan?.category_limit || 0);
@@ -158,7 +158,7 @@ export default function CategoriesPage() {
                     className="btn btn-primary"
                     onClick={() => {
                         setEditingCategory(null);
-                        setFormData({ name: '', image_url: '' });
+                        setFormData({ name: '', category_url: '' });
                         setShowForm(true);
                     }}
                     disabled={!canAddCategory}
@@ -215,8 +215,8 @@ export default function CategoriesPage() {
 
                             <div className="form-group">
                                 <label className="label">Category Image (Optional)</label>
-                                {formData.image_url && (
-                                    <img src={formData.image_url} alt="Category" className="preview-image" />
+                                {formData.category_url && (
+                                    <img src={formData.category_url} alt="Category" className="preview-image" />
                                 )}
                                 <input
                                     type="file"
@@ -261,8 +261,8 @@ export default function CategoriesPage() {
                     {categories.map((category) => (
                         <div key={category.id} className="category-card">
                             <div className="category-image">
-                                {category.image_url ? (
-                                    <img src={category.image_url} alt={category.name} />
+                                {category.category_url ? (
+                                    <img src={category.category_url || ''} alt={category.name} />
                                 ) : (
                                     <div className="placeholder-image">
                                         <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">

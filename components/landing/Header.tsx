@@ -4,73 +4,78 @@ import Link from 'next/link';
 import { useState } from 'react';
 
 export default function Header() {
-    const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
-    return (
-        <header className="header">
-            <div className="container">
-                <div className="header-inner">
-                    <Link href="/" className="logo">
-                        Shoppicca
-                    </Link>
+  return (
+    <header className="header">
+      <div className="container">
+        <div className="header-inner">
+          <Link href="/" className="logo" style={{ display: 'flex', alignItems: 'center', gap: '0rem', fontFamily: "'Cookie', cursive", fontWeight: 400, fontSize: '2rem', textDecoration: 'none' }}>
+            <img 
+              src="https://vcipbyfipxlhbzuyrtiq.supabase.co/storage/v1/object/public/shoppica_images/shoppicca_logo.png" 
+              alt="Shoppicca Logo" 
+              style={{ height: '45px', width: 'auto' }}
+            />
+            Shoppicca
+          </Link>
 
-                    <nav className={`nav ${mobileMenuOpen ? 'open' : ''}`}>
-                        <Link href="#about" onClick={() => setMobileMenuOpen(false)}>About</Link>
-                        <Link href="#how-it-works" onClick={() => setMobileMenuOpen(false)}>How It Works</Link>
-                        <Link href="#faq" onClick={() => setMobileMenuOpen(false)}>FAQ</Link>
-                        <Link href="#contact" onClick={() => setMobileMenuOpen(false)}>Contact</Link>
-                    </nav>
+          <nav className={`nav ${mobileMenuOpen ? 'open' : ''}`}>
+            <Link href="#about" onClick={() => setMobileMenuOpen(false)}>About</Link>
+            <Link href="#how-it-works" onClick={() => setMobileMenuOpen(false)}>How It Works</Link>
+            <Link href="#faq" onClick={() => setMobileMenuOpen(false)}>FAQ</Link>
+            <Link href="#contact" onClick={() => setMobileMenuOpen(false)}>Contact</Link>
+          </nav>
 
-                    <div className="header-actions">
-                        <Link href="/auth/login" className="btn btn-secondary">
-                            Login
-                        </Link>
-                        <Link href="/onboarding" className="btn btn-primary">
-                            Get Started
-                        </Link>
-                    </div>
+          <div className="header-actions">
+            <Link href="/auth/login" className="btn btn-secondary">
+              Login
+            </Link>
+            <Link href="/onboarding" className="btn btn-primary">
+              Get Started
+            </Link>
+          </div>
 
-                    <button
-                        className="mobile-menu-btn"
-                        onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                        aria-label="Toggle menu"
-                    >
-                        {mobileMenuOpen ? (
-                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                                <line x1="18" y1="6" x2="6" y2="18" />
-                                <line x1="6" y1="6" x2="18" y2="18" />
-                            </svg>
-                        ) : (
-                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                                <line x1="3" y1="12" x2="21" y2="12" />
-                                <line x1="3" y1="6" x2="21" y2="6" />
-                                <line x1="3" y1="18" x2="21" y2="18" />
-                            </svg>
-                        )}
-                    </button>
-                </div>
-            </div>
-
-            {mobileMenuOpen && (
-                <div className="mobile-menu">
-                    <nav>
-                        <Link href="#about" onClick={() => setMobileMenuOpen(false)}>About</Link>
-                        <Link href="#how-it-works" onClick={() => setMobileMenuOpen(false)}>How It Works</Link>
-                        <Link href="#faq" onClick={() => setMobileMenuOpen(false)}>FAQ</Link>
-                        <Link href="#contact" onClick={() => setMobileMenuOpen(false)}>Contact</Link>
-                    </nav>
-                    <div className="mobile-actions">
-                        <Link href="/auth/login" className="btn btn-secondary" onClick={() => setMobileMenuOpen(false)}>
-                            Login
-                        </Link>
-                        <Link href="/onboarding" className="btn btn-primary" onClick={() => setMobileMenuOpen(false)}>
-                            Get Started
-                        </Link>
-                    </div>
-                </div>
+          <button
+            className="mobile-menu-btn"
+            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            aria-label="Toggle menu"
+          >
+            {mobileMenuOpen ? (
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <line x1="18" y1="6" x2="6" y2="18" />
+                <line x1="6" y1="6" x2="18" y2="18" />
+              </svg>
+            ) : (
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <line x1="3" y1="12" x2="21" y2="12" />
+                <line x1="3" y1="6" x2="21" y2="6" />
+                <line x1="3" y1="18" x2="21" y2="18" />
+              </svg>
             )}
+          </button>
+        </div>
+      </div>
 
-            <style jsx>{`
+      {mobileMenuOpen && (
+        <div className="mobile-menu">
+          <nav>
+            <Link href="#about" onClick={() => setMobileMenuOpen(false)}>About</Link>
+            <Link href="#how-it-works" onClick={() => setMobileMenuOpen(false)}>How It Works</Link>
+            <Link href="#faq" onClick={() => setMobileMenuOpen(false)}>FAQ</Link>
+            <Link href="#contact" onClick={() => setMobileMenuOpen(false)}>Contact</Link>
+          </nav>
+          <div className="mobile-actions">
+            <Link href="/auth/login" className="btn btn-secondary" onClick={() => setMobileMenuOpen(false)}>
+              Login
+            </Link>
+            <Link href="/onboarding" className="btn btn-primary" onClick={() => setMobileMenuOpen(false)}>
+              Get Started
+            </Link>
+          </div>
+        </div>
+      )}
+
+      <style jsx>{`
         .header {
           position: sticky;
           top: 0;
@@ -87,14 +92,7 @@ export default function Header() {
           height: 70px;
         }
 
-        .logo {
-          font-family: var(--font-display);
-          font-size: 1.5rem;
-          font-weight: 700;
-          color: var(--color-text-primary);
-          text-decoration: none;
-        }
-
+        
         .nav {
           display: none;
         }
@@ -194,6 +192,6 @@ export default function Header() {
           justify-content: center;
         }
       `}</style>
-        </header>
-    );
+    </header>
+  );
 }

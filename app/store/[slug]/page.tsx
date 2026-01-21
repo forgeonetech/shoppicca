@@ -35,6 +35,13 @@ export default function StorePage() {
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
     const [searchQuery, setSearchQuery] = useState('');
     const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+    const [baseUrl, setBaseUrl] = useState('https://shoppicca.vercel.app');
+
+    useEffect(() => {
+        if (window.location.hostname.includes('localhost')) {
+            setBaseUrl('http://localhost:3000');
+        }
+    }, []);
 
     useEffect(() => {
         fetchStore();
@@ -52,7 +59,7 @@ export default function StorePage() {
             .from('stores')
             .select('*')
             .eq('slug', slug)
-            .single();
+            .maybeSingle();
 
         if (error || !storeData) {
             setNotFound(true);
@@ -127,7 +134,7 @@ export default function StorePage() {
             display: flex;
             align-items: center;
             justify-content: center;
-            background: #F8F9FA;
+            background: #F9FAFB;
           }
         `}</style>
             </div>
@@ -139,7 +146,7 @@ export default function StorePage() {
             <div className="not-found">
                 <h1>Store Not Found</h1>
                 <p>The store you&apos;re looking for doesn&apos;t exist.</p>
-                <Link href="/" className="btn btn-primary">Go to Shoppicca</Link>
+                <a href={baseUrl} className="btn btn-primary">Go to Shoppicca</a>
                 <style jsx>{`
           .not-found {
             min-height: 100vh;
@@ -163,7 +170,7 @@ export default function StorePage() {
             {/* Header */}
             <header className="store-header">
                 <div className="header-content">
-                    <Link href={`/store/${slug}`} className="store-name">
+                    <Link href="/" className="store-name" style={{ color: themeColor, fontSize: '1.75rem', fontWeight: 'bold', letterSpacing: '0.02em', fontFamily: "'Playfair Display', serif"}}>
                         {store?.name}
                     </Link>
                     <div className="header-icons">
@@ -257,7 +264,7 @@ export default function StorePage() {
                             ))}
                         </div>
                         <div className="menu-footer">
-                            <Link href="/auth/login">Admin Login</Link>
+                            <a href={`${baseUrl}/auth/login`}>Admin Login</a>
                         </div>
                     </div>
                 </>
@@ -320,14 +327,9 @@ export default function StorePage() {
             <main>
                 {/* Banner */}
                 {store?.banner_url && (
-                    <div className="banner">
-                        <Image src={store.banner_url} alt={store.name} fill style={{ objectFit: 'cover' }} priority />
-                        <div className="banner-overlay">
-                            <span className="banner-tagline">{store.description || 'Welcome to our store'}</span>
-                            <h1 className="banner-title">Step Into Style</h1>
-                            <button className="shop-now-btn" onClick={() => window.scrollTo({ top: 600, behavior: 'smooth' })}>
-                                SHOP NOW
-                            </button>
+                    <div className="banner-container">
+                        <div className="banner">
+                            <Image src={store.banner_url} alt={store.name} fill style={{ objectFit: 'cover' }} priority />
                         </div>
                     </div>
                 )}
@@ -347,8 +349,8 @@ export default function StorePage() {
                                     onClick={() => setSelectedCategory(cat.id)}
                                 >
                                     <div className="category-image">
-                                        {cat.image_url ? (
-                                            <Image src={cat.image_url} alt={cat.name} fill style={{ objectFit: 'cover' }} />
+                                        {cat.category_url ? (
+                                            <Image src={cat.category_url || ''} alt={cat.name} fill style={{ objectFit: 'cover' }} />
                                         ) : (
                                             <div className="placeholder"></div>
                                         )}
@@ -376,7 +378,7 @@ export default function StorePage() {
                         <div className="products-grid">
                             {filteredProducts.map((product) => (
                                 <div key={product.id} className="product-card">
-                                    <Link href={`/store/${slug}/product/${product.id}`} className="product-image">
+                                    <div className="product-image">
                                         {product.product_images?.[0] ? (
                                             <Image
                                                 src={product.product_images[0].image_url}
@@ -387,7 +389,7 @@ export default function StorePage() {
                                         ) : (
                                             <div className="placeholder"></div>
                                         )}
-                                    </Link>
+                                    </div>
                                     <button
                                         className={`wishlist-btn ${isInWishlist(product.id) ? 'active' : ''}`}
                                         onClick={() => toggleWishlist(product)}
@@ -397,9 +399,7 @@ export default function StorePage() {
                                         </svg>
                                     </button>
                                     <div className="product-info">
-                                        <Link href={`/store/${slug}/product/${product.id}`}>
-                                            <h3>{product.name}</h3>
-                                        </Link>
+                                        <h3>{product.name}</h3>
                                         <span className="product-price">{formatPrice(product.price, product.price_type)}</span>
                                     </div>
                                 </div>
@@ -443,107 +443,162 @@ export default function StorePage() {
                     )}
                 </div>
                 <div className="footer-bottom">
-                    <p>Powered by <a href="/">Shoppicca</a></p>
+                    <p>Powered by <a href={baseUrl} style={{ fontFamily: "'Cookie', cursive", fontWeight: 400, fontSize: '2rem', textDecoration: 'none' }}>Shoppicca</a></p>
                 </div>
             </footer>
 
             <style jsx>{`
-        .store-page { min-height: 100vh; background: #FFFFFF; }
+        ..store-page { 
+            min-height: 100vh; 
+            background: #F3F4F6; /* Light grey background for the whole page */
+        }
 
-        /* Header */
+        /* Header - Kept white for contrast */
         .store-header { background: white; border-bottom: 1px solid #E5E7EB; position: sticky; top: 0; z-index: 40; }
-        .header-content { display: flex; align-items: center; justify-content: space-between; padding: 1rem 1.5rem; }
-        .store-name { font-family: 'Playfair Display', serif; font-size: 1.5rem; font-weight: 600; color: ${themeColor}; text-decoration: none; }
+        .header-content { display: flex; align-items: center; justify-content: space-between; padding: 1rem 1.5rem; height: 70px; max-width: 1400px; margin: 0 auto; width: 100%; }
+        .store-name { font-family: 'Playfair Display', serif; font-size: 2rem; font-weight: 700; color: ${themeColor}; text-decoration: none; letter-spacing: -0.02em; }
         .header-icons { display: flex; gap: 0.5rem; }
-        .icon-btn { position: relative; padding: 0.5rem; background: none; border: none; cursor: pointer; color: ${themeColor}; }
+        .icon-btn { position: relative; padding: 0.5rem; background: none; border: none; cursor: pointer; color: ${themeColor}; transition: opacity 0.2s; }
+        .icon-btn:hover { opacity: 0.7; }
         .wishlist-count { position: absolute; top: 0; right: 0; width: 18px; height: 18px; background: ${accentColor}; color: white; font-size: 0.6875rem; font-weight: 600; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
-        .category-nav { display: flex; gap: 0.5rem; padding: 0 1rem 0.75rem; overflow-x: auto; }
+        .category-nav { display: flex; gap: 1.5rem; padding: 0 1.5rem 1rem; overflow-x: auto; justify-content: flex-start; border-bottom: 1px solid #F3F4F6; max-width: 1400px; margin: 0 auto; width: 100%; }
+        @media (min-width: 768px) {
+            .header-content { padding: 1rem 2rem; }
+            .category-nav { padding: 0 2rem 1rem; justify-content: center; border-bottom: none; }
+            .store-name { font-size: 2rem; }
+        }
         .category-nav::-webkit-scrollbar { display: none; }
-        .nav-item { padding: 0.5rem 1rem; font-size: 0.8125rem; color: #6B7280; background: none; border: none; cursor: pointer; white-space: nowrap; }
-        .nav-item.active { color: ${themeColor}; font-weight: 500; }
+        .nav-item { padding: 0.5rem 0; font-size: 0.9375rem; color: #4B5563; background: none; border: none; cursor: pointer; white-space: nowrap; transition: color 0.2s; position: relative; }
+        .nav-item:hover { color: ${themeColor}; }
+        .nav-item.active { color: ${themeColor}; font-weight: 600; }
+        .nav-item.active::after { content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 2px; background: ${accentColor}; border-radius: 2px; }
 
         /* Mobile Menu */
-        .menu-overlay, .wishlist-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 50; }
-        .mobile-menu { position: fixed; top: 0; right: 0; bottom: 0; width: 300px; background: white; z-index: 60; display: flex; flex-direction: column; animation: slideIn 0.3s ease; }
+        .menu-overlay, .wishlist-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 50; backdrop-filter: blur(2px); }
+        .mobile-menu { position: fixed; top: 0; right: 0; bottom: 0; width: 300px; background: white; z-index: 60; display: flex; flex-direction: column; animation: slideIn 0.3s cubic-bezier(0.16, 1, 0.3, 1); box-shadow: -4px 0 20px rgba(0,0,0,0.1); }
         @keyframes slideIn { from { transform: translateX(100%); } to { transform: translateX(0); } }
-        .menu-header { display: flex; justify-content: space-between; align-items: center; padding: 1rem 1.5rem; border-bottom: 1px solid #E5E7EB; }
-        .menu-header h3 { font-size: 1.125rem; font-weight: 600; }
-        .menu-header button { background: none; border: none; cursor: pointer; color: #6B7280; }
-        .search-box { display: flex; align-items: center; gap: 0.75rem; margin: 1rem; padding: 0.75rem 1rem; background: #F3F4F6; border-radius: 0.5rem; }
-        .search-box input { flex: 1; background: none; border: none; outline: none; font-size: 0.9375rem; }
-        .menu-categories { flex: 1; padding: 1rem; overflow-y: auto; }
-        .menu-categories h4 { font-size: 0.75rem; color: #9CA3AF; text-transform: uppercase; margin-bottom: 0.75rem; }
-        .menu-categories button { display: block; width: 100%; text-align: left; padding: 0.75rem 0; font-size: 0.9375rem; color: #374151; background: none; border: none; border-bottom: 1px solid #F3F4F6; cursor: pointer; }
-        .menu-categories button.active { color: ${themeColor}; font-weight: 500; }
-        .menu-footer { padding: 1rem 1.5rem; border-top: 1px solid #E5E7EB; }
-        .menu-footer a { font-size: 0.875rem; color: ${themeColor}; text-decoration: none; }
+        .menu-header { display: flex; justify-content: space-between; align-items: center; padding: 1.5rem; border-bottom: 1px solid #F3F4F6; }
+        .menu-header h3 { font-size: 1.25rem; font-weight: 600; font-family: 'Playfair Display', serif; }
+        .menu-header button { background: none; border: none; cursor: pointer; color: #6B7280; padding: 0.5rem; margin: -0.5rem; }
+        .search-box { display: flex; align-items: center; gap: 0.75rem; margin: 1.5rem; padding: 0.875rem 1rem; background: #F9FAFB; border-radius: 0.75rem; border: 1px solid #E5E7EB; transition: all 0.2s; }
+        .search-box:focus-within { border-color: ${themeColor}; box-shadow: 0 0 0 3px rgba(0,0,0,0.05); background: white; }
+        .search-box input { flex: 1; background: none; border: none; outline: none; font-size: 0.9375rem; width: 100%; }
+        .menu-categories { flex: 1; padding: 0 1.5rem; overflow-y: auto; }
+        .menu-categories h4 { font-size: 0.75rem; color: #9CA3AF; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 1rem; font-weight: 600; }
+        .menu-categories button { display: block; width: 100%; text-align: left; padding: 0.875rem 0; font-size: 1rem; color: #374151; background: none; border: none; border-bottom: 1px solid #F3F4F6; cursor: pointer; transition: color 0.2s; }
+        .menu-categories button:hover { color: ${themeColor}; }
+        .menu-categories button.active { color: ${themeColor}; font-weight: 600; }
+        .menu-footer { padding: 1.5rem; border-top: 1px solid #F3F4F6; background: #F9FAFB; }
+        .menu-footer a { font-size: 0.875rem; color: ${themeColor}; text-decoration: none; font-weight: 500; }
 
         /* Wishlist Drawer */
-        .wishlist-drawer { position: fixed; top: 0; right: 0; bottom: 0; width: 350px; max-width: 100%; background: white; z-index: 60; display: flex; flex-direction: column; animation: slideIn 0.3s ease; }
-        .drawer-header { display: flex; justify-content: space-between; align-items: center; padding: 1rem 1.5rem; border-bottom: 1px solid #E5E7EB; }
-        .drawer-header h3 { font-size: 1.125rem; font-weight: 600; }
-        .drawer-header button { background: none; border: none; cursor: pointer; color: #6B7280; }
-        .empty-wishlist { flex: 1; display: flex; align-items: center; justify-content: center; color: #9CA3AF; }
-        .wishlist-items { flex: 1; overflow-y: auto; padding: 1rem; }
-        .wishlist-item { display: flex; gap: 0.75rem; align-items: center; padding: 0.75rem 0; border-bottom: 1px solid #F3F4F6; }
-        .item-image { position: relative; width: 60px; height: 60px; border-radius: 0.5rem; overflow: hidden; background: #F3F4F6; flex-shrink: 0; }
+        .wishlist-drawer { position: fixed; top: 0; right: 0; bottom: 0; width: 400px; max-width: 100%; background: white; z-index: 60; display: flex; flex-direction: column; animation: slideIn 0.3s cubic-bezier(0.16, 1, 0.3, 1); box-shadow: -4px 0 20px rgba(0,0,0,0.1); }
+        .drawer-header { display: flex; justify-content: space-between; align-items: center; padding: 1.5rem; border-bottom: 1px solid #F3F4F6; }
+        .drawer-header h3 { font-size: 1.25rem; font-weight: 600; font-family: 'Playfair Display', serif; }
+        .drawer-header button { background: none; border: none; cursor: pointer; color: #6B7280; padding: 0.5rem; margin: -0.5rem; }
+        .empty-wishlist { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1rem; color: #9CA3AF; }
+        .wishlist-items { flex: 1; overflow-y: auto; padding: 1.5rem; }
+        .wishlist-item { display: flex; gap: 1rem; align-items: center; padding: 1rem; border: 1px solid #F3F4F6; border-radius: 0.75rem; margin-bottom: 1rem; transition: border-color 0.2s; }
+        .wishlist-item:hover { border-color: #E5E7EB; }
+        .item-image { position: relative; width: 70px; height: 70px; border-radius: 0.5rem; overflow: hidden; background: #F3F4F6; flex-shrink: 0; }
         .item-info { flex: 1; }
-        .item-name { display: block; font-size: 0.875rem; font-weight: 500; margin-bottom: 0.25rem; }
-        .item-price { font-size: 0.8125rem; color: #6B7280; }
-        .remove-item { padding: 0.25rem; background: none; border: none; color: #9CA3AF; cursor: pointer; }
-        .send-whatsapp-btn { display: flex; align-items: center; justify-content: center; gap: 0.75rem; width: calc(100% - 2rem); margin: 1rem; padding: 1rem; background: #25D366; color: white; border: none; border-radius: 0.5rem; font-size: 0.9375rem; font-weight: 500; cursor: pointer; }
+        .item-name { display: block; font-size: 0.9375rem; font-weight: 500; margin-bottom: 0.25rem; color: #1F2937; }
+        .item-price { font-size: 0.875rem; color: #6B7280; }
+        .remove-item { padding: 0.5rem; background: none; border: none; color: #9CA3AF; cursor: pointer; border-radius: 0.375rem; transition: all 0.2s; }
+        .remove-item:hover { background: #FEE2E2; color: #EF4444; }
+        .send-whatsapp-btn { display: flex; align-items: center; justify-content: center; gap: 0.75rem; margin: 1.5rem; padding: 1rem; background: #25D366; color: white; border: none; border-radius: 0.75rem; font-size: 1rem; font-weight: 600; cursor: pointer; transition: transform 0.2s, box-shadow 0.2s; }
+        .send-whatsapp-btn:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(37, 211, 102, 0.3); }
 
         /* Banner */
-        .banner { position: relative; width: 100%; height: 400px; background: #F3F4F6; }
-        @media (min-width: 768px) { .banner { height: 500px; } }
-        .banner-overlay { position: absolute; inset: 0; display: flex; flex-direction: column; justify-content: center; padding: 2rem; background: linear-gradient(90deg, rgba(0,0,0,0.4) 0%, rgba(0,0,0,0) 100%); }
-        .banner-tagline { font-size: 0.875rem; color: rgba(255,255,255,0.9); margin-bottom: 0.5rem; }
-        .banner-title { font-family: 'Playfair Display', serif; font-size: 2.5rem; color: white; margin-bottom: 1.5rem; }
-        @media (min-width: 768px) { .banner-title { font-size: 3.5rem; } }
-        .shop-now-btn { display: inline-block; padding: 0.75rem 2rem; background: ${themeColor}; color: white; border: none; border-radius: 9999px; font-size: 0.875rem; font-weight: 500; letter-spacing: 0.05em; cursor: pointer; }
+        .banner-container { padding: 0; max-width: 1400px; margin: 0 auto; width: 100%; }
+        @media (min-width: 768px) { .banner-container { padding: 2rem; } }
+        .banner { position: relative; width: 100%; height: 300px; border-radius: 0; overflow: hidden; box-shadow: none; transform: translateZ(0); }
+        @media (min-width: 768px) { .banner { height: 400px; border-radius: 1.5rem; box-shadow: 0 20px 40px -10px rgba(0,0,0,0.1); } }
+        @media (min-width: 1024px) { .banner { height: 500px; } }
 
         /* Sections */
-        .categories-section, .products-section { padding: 2rem 1rem; }
+        .categories-section, .products-section { padding: 2rem 1rem; max-width: 1400px; margin: 0 auto; width: 100%; }
         @media (min-width: 768px) { .categories-section, .products-section { padding: 3rem 2rem; } }
-        .section-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; }
-        .section-header h2 { font-size: 1.25rem; font-weight: 600; color: #1A1A2E; }
-        .section-header button { font-size: 0.875rem; color: #6B7280; background: none; border: none; cursor: pointer; }
+        .section-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; padding: 0 0.5rem; }
+        .section-header h2 { font-family: 'Playfair Display', serif; font-size: 1.5rem; font-weight: 600; color: #1A1A2E; }
+        @media (min-width: 768px) { .section-header h2 { font-size: 2rem; } }
+        .section-header button { display: flex; align-items: center; gap: 0.5rem; font-size: 0.875rem; font-weight: 500; color: #6B7280; background: none; border: none; cursor: pointer; transition: color 0.2s; }
+        .section-header button:hover { color: ${themeColor}; }
 
-        /* Categories */
-        .categories-scroll { display: flex; gap: 1rem; overflow-x: auto; padding-bottom: 0.5rem; }
+        /* Categories - Reduced by 10% and added background/shadow */
+        .categories-scroll { display: flex; gap: 1rem; overflow-x: auto; padding: 0.5rem 1rem 1.5rem 1.5rem; scroll-snap-type: x mandatory; scroll-padding-left: 1.5rem; margin: 0 -1rem; }
+        @media (min-width: 768px) { .categories-scroll { margin: 0; padding-bottom: 1.5rem; padding-left: 0; } }
         .categories-scroll::-webkit-scrollbar { display: none; }
-        .category-card { flex-shrink: 0; width: 100px; text-align: center; background: none; border: none; cursor: pointer; }
-        @media (min-width: 640px) { .category-card { width: 140px; } }
-        .category-image { width: 100%; aspect-ratio: 1; border-radius: 0.75rem; overflow: hidden; margin-bottom: 0.5rem; background: #F3F4F6; position: relative; }
-        .category-card span { font-size: 0.8125rem; color: #374151; }
+        .category-card { 
+            flex-shrink: 0; 
+            width: 81px; /* Reduced from 90px (10%) */
+            text-align: center; 
+            background: white; 
+            border: 1px solid #E5E7EB; 
+            cursor: pointer; 
+            scroll-snap-align: start; 
+            padding: 0.75rem; 
+            border-radius: 1rem; 
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
+        }
+        @media (min-width: 640px) { .category-card { width: 126px; } } /* Reduced from 140px */
+        @media (min-width: 1024px) { .category-card { width: 162px; } } /* Reduced from 180px */
+        
+        .category-image { width: 100%; aspect-ratio: 4/3; border-radius: 0.5rem; overflow: hidden; margin-bottom: 0.5rem; background: #F3F4F6; position: relative; }
+        .category-card:hover { transform: translateY(-4px); box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1); }
+        .category-card span { font-size: 0.75rem; font-weight: 500; color: #374151; display: block; transition: color 0.2s; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        @media (min-width: 640px) { .category-card span { font-size: 0.875rem; } }
+        .category-card:hover span { color: ${themeColor}; }
 
-        /* Products Grid */
+        /* Products Grid - Reduced by 20% and added spacing/shadows */
         .products-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem; }
-        @media (min-width: 640px) { .products-grid { grid-template-columns: repeat(3, 1fr); gap: 1.25rem; } }
-        @media (min-width: 1024px) { .products-grid { grid-template-columns: repeat(4, 1fr); gap: 1.5rem; } }
-        .product-card { position: relative; background: white; border-radius: 0.75rem; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.08); }
-        .product-image { display: block; position: relative; aspect-ratio: 1; background: #F8F9FA; }
-        .placeholder { width: 100%; height: 100%; background: #E5E7EB; }
-        .wishlist-btn { position: absolute; top: 0.5rem; right: 0.5rem; width: 32px; height: 32px; background: white; border: none; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 2px 4px rgba(0,0,0,0.1); color: #9CA3AF; z-index: 10; }
-        .wishlist-btn.active { color: #EF4444; }
-        .product-info { padding: 0.75rem; }
-        .product-info h3 { font-size: 0.875rem; font-weight: 500; color: #1A1A2E; margin-bottom: 0.25rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .product-info a { text-decoration: none; }
-        .product-price { font-size: 0.8125rem; color: #6B7280; }
-        .empty-products { text-align: center; padding: 3rem; color: #9CA3AF; }
+        @media (min-width: 640px) { .products-grid { grid-template-columns: repeat(3, 1fr); gap: 1.5rem; } }
+        @media (min-width: 1024px) { 
+            .products-grid { 
+                grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); /* Reduced size approx 20% */
+                gap: 2rem; 
+            } 
+        }
+
+        .product-card { 
+            position: relative; 
+            background: white; 
+            border-radius: 1.25rem; 
+            border: 1px solid #E5E7EB;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            overflow: hidden;
+        }
+        .product-card:hover { transform: translateY(-6px); box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1); }
+
+        .product-image { display: block; position: relative; aspect-ratio: 1; background: #F8F9FA; border-bottom: 1px solid #F3F4F6; overflow: hidden; transition: transform 0.3s ease; }
+        
+        .placeholder { width: 100%; height: 100%; background: #E5E7EB; display: flex; align-items: center; justify-content: center; color: #9CA3AF; }
+        
+        .wishlist-btn { position: absolute; top: 0.75rem; right: 0.75rem; width: 36px; height: 36px; background: white; border: none; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); color: #9CA3AF; z-index: 10; transition: all 0.2s; }
+        .wishlist-btn:hover { transform: scale(1.1); color: #EF4444; }
+        .wishlist-btn.active { color: #EF4444; background: white; }
+
+        .product-info { padding: 1.25rem; text-align: left; } /* Added nice padding from border */
+        .product-info h3 { font-size: 0.9375rem; font-weight: 600; color: #1F2937; margin-bottom: 0.5rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-family: 'Inter', sans-serif; }
+        .product-price { font-size: 1rem; color: ${themeColor}; font-weight: 700; }
+        
+        .empty-products { text-align: center; padding: 4rem 1rem; color: #9CA3AF; background: white; border-radius: 1rem; grid-column: 1 / -1; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05); }
 
         /* Footer */
-        .store-footer { background: #1A1A2E; color: white; padding: 2rem 1rem; margin-top: 2rem; }
-        .footer-content { max-width: 1200px; margin: 0 auto; display: flex; flex-direction: column; gap: 1.5rem; align-items: center; text-align: center; }
+        .store-footer { background: #1A1A2E; color: white; padding: 4rem 1rem 2rem; margin-top: 4rem; }
+        .footer-content { max-width: 1400px; margin: 0 auto; display: flex; flex-direction: column; gap: 2rem; align-items: center; text-align: center; }
         @media (min-width: 768px) { .footer-content { flex-direction: row; justify-content: space-between; text-align: left; } }
-        .footer-brand h3 { font-family: 'Playfair Display', serif; font-size: 1.25rem; margin-bottom: 0.5rem; }
-        .footer-brand p { font-size: 0.875rem; color: rgba(255,255,255,0.7); max-width: 300px; }
-        .footer-social { display: flex; gap: 1rem; }
-        .footer-social a { color: rgba(255,255,255,0.7); transition: color 0.2s; }
-        .footer-social a:hover { color: white; }
-        .footer-bottom { text-align: center; padding-top: 1.5rem; margin-top: 1.5rem; border-top: 1px solid rgba(255,255,255,0.1); }
-        .footer-bottom p { font-size: 0.8125rem; color: rgba(255,255,255,0.5); }
-        .footer-bottom a { color: ${accentColor}; text-decoration: none; }
+        .footer-brand h3 { font-family: 'Playfair Display', serif; font-size: 1.75rem; margin-bottom: 0.75rem; }
+        .footer-brand p { font-size: 0.9375rem; color: rgba(255,255,255,0.7); max-width: 320px; line-height: 1.6; }
+        .footer-social { display: flex; gap: 1.25rem; }
+        .footer-social a { color: rgba(255,255,255,0.6); transition: all 0.2s; }
+        .footer-social a:hover { color: white; transform: translateY(-2px); }
+        .footer-bottom { text-align: center; padding-top: 2rem; margin-top: 3rem; border-top: 1px solid rgba(255,255,255,0.1); }
+        .footer-bottom p { font-size: 0.875rem; color: rgba(255,255,255,0.5); }
+        .footer-bottom a { color: white; text-decoration: none; font-weight: 500; transition: opacity 0.2s; }
+        .footer-bottom a:hover { opacity: 0.8; }
       `}</style>
         </div>
     );

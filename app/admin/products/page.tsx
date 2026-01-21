@@ -47,7 +47,7 @@ export default function ProductsPage() {
             .from('stores')
             .select('*, plans(*)')
             .eq('owner_id', user.id)
-            .single();
+            .maybeSingle();
 
         if (storeData) {
             setStore(storeData);
@@ -124,7 +124,7 @@ export default function ProductsPage() {
                     .from('products')
                     .insert(productData)
                     .select()
-                    .single();
+                    .maybeSingle();
                 if (insertError) throw insertError;
                 productId = newProduct.id;
             }

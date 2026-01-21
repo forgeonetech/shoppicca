@@ -34,7 +34,7 @@ export default function AdminLayout({
                 .from('stores')
                 .select('*, plans(*)')
                 .eq('owner_id', user.id)
-                .single();
+                .maybeSingle();
 
             if (!storeData) {
                 router.push('/onboarding');
@@ -153,7 +153,7 @@ export default function AdminLayout({
             {/* Sidebar */}
             <aside className={`sidebar ${sidebarOpen ? 'open' : ''}`}>
                 <div className="sidebar-header">
-                    <Link href="/" className="logo">Shoppicca</Link>
+                    <Link href="/" className="logo" style={{ fontFamily: "'Cookie', cursive", fontWeight: 400, fontSize: '2rem', textDecoration: 'none' }}>Shoppicca</Link>
                     <button className="close-btn" onClick={() => setSidebarOpen(false)}>
                         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                             <line x1="18" y1="6" x2="6" y2="18" />
@@ -247,6 +247,7 @@ export default function AdminLayout({
         .header-title {
           font-family: var(--font-display);
           font-weight: 600;
+          font-size: 2rem;
           color: var(--color-text-primary);
         }
 

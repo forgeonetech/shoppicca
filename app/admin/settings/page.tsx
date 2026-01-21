@@ -42,7 +42,7 @@ export default function SettingsPage() {
             .from('stores')
             .select('*, plans(*)')
             .eq('owner_id', user.id)
-            .single();
+            .maybeSingle();
 
         if (storeData) {
             setStore(storeData);
@@ -90,7 +90,7 @@ export default function SettingsPage() {
                     .select('id')
                     .eq('slug', formData.slug)
                     .neq('id', store?.id)
-                    .single();
+                    .maybeSingle();
 
                 if (existingStore) {
                     setError('This store URL is already taken');

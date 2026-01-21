@@ -16,14 +16,14 @@ export async function POST(request: NextRequest) {
             .from('stores')
             .select('id, plan_id, plans(*)')
             .eq('owner_id', user.id)
-            .single();
+            .maybeSingle();
 
         if (!store) {
             return NextResponse.json({ error: 'Store not found' }, { status: 404 });
         }
 
         const body = await request.json();
-        const { name } = body;
+        const { name, category_url } = body;
 
         if (!name) {
             return NextResponse.json({ error: 'Category name is required' }, { status: 400 });
@@ -50,6 +50,7 @@ export async function POST(request: NextRequest) {
             .insert({
                 store_id: store.id,
                 name,
+                category_url: category_url || null,
             })
             .select()
             .single();

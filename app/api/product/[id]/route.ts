@@ -13,7 +13,7 @@ export async function GET(
             .from('products')
             .select('*, product_images(*), product_attributes(*), categories(*)')
             .eq('id', id)
-            .single();
+            .maybeSingle();
 
         if (error || !product) {
             return NextResponse.json({ error: 'Product not found' }, { status: 404 });

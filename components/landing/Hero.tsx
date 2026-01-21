@@ -1,69 +1,59 @@
 'use client';
 
 import Link from 'next/link';
+import Image from 'next/image';
 
 export default function Hero() {
-    return (
-        <section className="hero">
-            <div className="container">
-                <div className="hero-content">
-                    <span className="hero-badge">Launch Your Online Store Today</span>
-                    <h1 className="hero-title">
-                        Create Your <span className="text-accent">Beautiful</span> Online Store in Minutes
-                    </h1>
-                    <p className="hero-subtitle">
-                        Shoppicca helps entrepreneurs and small businesses launch professional
-                        e-commerce stores with zero technical skills. Get discovered, sell more,
-                        and grow your business.
-                    </p>
-                    <div className="hero-buttons">
-                        <Link href="/onboarding" className="btn btn-dark btn-lg">
-                            Set Up Your Store
-                        </Link>
-                        <Link href="#how-it-works" className="btn btn-outline btn-lg">
-                            Learn More
-                        </Link>
-                    </div>
-                    <div className="hero-stats">
-                        <div className="stat">
-                            <span className="stat-value">500+</span>
-                            <span className="stat-label">Active Stores</span>
-                        </div>
-                        <div className="stat">
-                            <span className="stat-value">10K+</span>
-                            <span className="stat-label">Products Listed</span>
-                        </div>
-                        <div className="stat">
-                            <span className="stat-value">50K+</span>
-                            <span className="stat-label">Happy Customers</span>
-                        </div>
-                    </div>
-                </div>
-                <div className="hero-image">
-                    <div className="hero-mockup">
-                        <div className="mockup-header">
-                            <div className="mockup-dots">
-                                <span></span>
-                                <span></span>
-                                <span></span>
-                            </div>
-                        </div>
-                        <div className="mockup-content">
-                            <div className="mockup-store-header">
-                                <span className="mockup-store-name">Your Store</span>
-                            </div>
-                            <div className="mockup-products">
-                                <div className="mockup-product"></div>
-                                <div className="mockup-product"></div>
-                                <div className="mockup-product"></div>
-                                <div className="mockup-product"></div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+  return (
+    <section className="hero">
+      <div className="container">
+        <div className="hero-content">
+          <span className="hero-badge">Launch Your Online Store Today</span>
+          <h1 className="hero-title">
+            Create Your <span className="text-accent">Beautiful</span> Online Store in Minutes
+          </h1>
+          <p className="hero-subtitle">
+            Shoppicca helps entrepreneurs and small businesses launch professional
+            e-commerce stores with zero technical skills. Get discovered, sell more,
+            and grow your business.
+          </p>
+          <div className="hero-buttons">
+            <Link href="/onboarding" className="btn btn-dark btn-lg">
+              Set Up Your Store
+            </Link>
+            <Link href="#how-it-works" className="btn btn-outline btn-lg">
+              Learn More
+            </Link>
+          </div>
+          <div className="hero-stats">
+            <div className="stat">
+              <span className="stat-value">500+</span>
+              <span className="stat-label">Active Stores</span>
             </div>
+            <div className="stat">
+              <span className="stat-value">10K+</span>
+              <span className="stat-label">Products Listed</span>
+            </div>
+            <div className="stat">
+              <span className="stat-value">50K+</span>
+              <span className="stat-label">Happy Customers</span>
+            </div>
+          </div>
+        </div>
 
-            <style jsx>{`
+        {/* Replace mockup with your image */}
+        <div className="hero-image">
+          <Image
+            src="https://vcipbyfipxlhbzuyrtiq.supabase.co/storage/v1/object/public/shoppica_images/store_example.png" // <- just replace this with your URL
+            alt="Store mockup"
+            width={450} // keep the same max-width as before
+            height={600} // adjust if needed
+            className="hero-img"
+          />
+        </div>
+      </div>
+
+      <style jsx>{`
         .hero {
           padding: 6rem 0 4rem;
           background: linear-gradient(135deg, #F8F9FA 0%, #FFFFFF 50%, #F0F7FF 100%);
@@ -133,12 +123,6 @@ export default function Hero() {
           max-width: 520px;
         }
 
-        @media (min-width: 1024px) {
-          .hero-subtitle {
-            margin-left: 0;
-          }
-        }
-
         .hero-buttons {
           display: flex;
           flex-direction: column;
@@ -194,77 +178,17 @@ export default function Hero() {
         @media (min-width: 1024px) {
           .hero-image {
             display: block;
+            margin-left: auto;
           }
         }
 
-        .hero-mockup {
-          background: white;
+        .hero-img {
+          width: 100%;
+          max-width: 450px;
           border-radius: 1rem;
           box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.15);
-          overflow: hidden;
-          max-width: 450px;
-          margin-left: auto;
-        }
-
-        .mockup-header {
-          background: #F3F4F6;
-          padding: 0.75rem 1rem;
-        }
-
-        .mockup-dots {
-          display: flex;
-          gap: 0.5rem;
-        }
-
-        .mockup-dots span {
-          width: 12px;
-          height: 12px;
-          border-radius: 50%;
-          background: #D1D5DB;
-        }
-
-        .mockup-dots span:first-child {
-          background: #EF4444;
-        }
-
-        .mockup-dots span:nth-child(2) {
-          background: #F59E0B;
-        }
-
-        .mockup-dots span:last-child {
-          background: #10B981;
-        }
-
-        .mockup-content {
-          padding: 1.5rem;
-        }
-
-        .mockup-store-header {
-          text-align: center;
-          padding-bottom: 1rem;
-          border-bottom: 1px solid var(--color-border);
-          margin-bottom: 1rem;
-        }
-
-        .mockup-store-name {
-          font-family: var(--font-display);
-          font-size: 1.25rem;
-          font-weight: 600;
-          color: var(--color-text-primary);
-        }
-
-        .mockup-products {
-          display: grid;
-          grid-template-columns: repeat(2, 1fr);
-          gap: 0.75rem;
-        }
-
-        .mockup-product {
-          aspect-ratio: 1;
-          background: linear-gradient(135deg, #F3F4F6 0%, #E5E7EB 100%);
-          border-radius: 0.5rem;
         }
       `}</style>
-        </section>
-    );
+    </section>
+  );
 }

@@ -16,7 +16,7 @@ export async function POST(request: NextRequest) {
             .from('stores')
             .select('id')
             .eq('owner_id', user.id)
-            .single();
+            .maybeSingle();
 
         if (!store) {
             return NextResponse.json({ error: 'Store not found' }, { status: 404 });
