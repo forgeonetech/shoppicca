@@ -28,6 +28,7 @@ export default function ProductsPage() {
         name: '',
         description: '',
         price: '',
+        sale_price: '',
         price_type: 'fixed' as 'fixed' | 'negotiable' | 'dm',
         category_id: '',
         is_visible: true,
@@ -80,6 +81,7 @@ export default function ProductsPage() {
             name: '',
             description: '',
             price: '',
+            sale_price: '',
             price_type: 'fixed',
             category_id: '',
             is_visible: true,
@@ -101,6 +103,7 @@ export default function ProductsPage() {
                 name: formData.name,
                 description: formData.description || null,
                 price: formData.price_type === 'dm' ? null : parseFloat(formData.price) || null,
+                sale_price: formData.price_type === 'fixed' && formData.sale_price ? parseFloat(formData.sale_price) : null,
                 price_type: formData.price_type,
                 category_id: formData.category_id || null,
                 is_visible: formData.is_visible,
@@ -170,6 +173,7 @@ export default function ProductsPage() {
             name: product.name,
             description: product.description || '',
             price: product.price?.toString() || '',
+            sale_price: product.sale_price?.toString() || '',
             price_type: product.price_type,
             category_id: product.category_id || '',
             is_visible: product.is_visible,
@@ -245,6 +249,10 @@ export default function ProductsPage() {
                 <button
                     className="btn btn-primary"
                     onClick={() => {
+                        if (plan?.products_per_category && products.length >= plan.products_per_category) {
+                            alert(`You have reached the limit of ${plan.products_per_category} products. Upgrade to Pro for unlimited products.`);
+                            return;
+                        }
                         resetForm();
                         setShowForm(true);
                     }}
@@ -342,17 +350,33 @@ export default function ProductsPage() {
                                     </div>
 
                                     {formData.price_type !== 'dm' && (
-                                        <div className="form-group">
-                                            <label className="label">Price (GHC)</label>
-                                            <input
-                                                type="number"
-                                                className="input"
-                                                value={formData.price}
-                                                onChange={(e) => setFormData({ ...formData, price: e.target.value })}
-                                                min="0"
-                                                step="0.01"
-                                            />
-                                        </div>
+                                        <>
+                                            <div className="form-group">
+                                                <label className="label">Price (GHC)</label>
+                                                <input
+                                                    type="number"
+                                                    className="input"
+                                                    value={formData.price}
+                                                    onChange={(e) => setFormData({ ...formData, price: e.target.value })}
+                                                    min="0"
+                                                    step="0.01"
+                                                />
+                                            </div>
+                                            {formData.price_type === 'fixed' && (
+                                                <div className="form-group">
+                                                    <label className="label">Sale Price (Optional)</label>
+                                                    <input
+                                                        type="number"
+                                                        className="input"
+                                                        value={formData.sale_price}
+                                                        onChange={(e) => setFormData({ ...formData, sale_price: e.target.value })}
+                                                        min="0"
+                                                        step="0.01"
+                                                        placeholder="Leave empty if not on sale"
+                                                    />
+                                                </div>
+                                            )}
+                                        </>
                                     )}
                                 </div>
                             </div>
@@ -468,7 +492,14 @@ export default function ProductsPage() {
                                 <p className="product-price">
                                     {product.price_type === 'dm'
                                         ? 'DM for price'
-                                        : `GHC ${product.price?.toLocaleString() || 0}`}
+                                        : product.sale_price ? (
+                                            <>
+                                                <span style={{ textDecoration: 'line-through', marginRight: '0.5rem', opacity: 0.7 }}>GHC {product.price?.toLocaleString()}</span>
+                                                <span style={{ color: 'var(--color-primary)', fontWeight: 600 }}>GHC {product.sale_price.toLocaleString()}</span>
+                                            </>
+                                        ) : (
+                                            `GHC ${product.price?.toLocaleString() || 0}`
+                                        )}
                                     {product.price_type === 'negotiable' && ' (Negotiable)'}
                                 </p>
                             </div>
@@ -499,7 +530,7 @@ export default function ProductsPage() {
 
         .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; z-index: 100; padding: 1rem; }
         .modal { background: white; border-radius: var(--radius-xl); width: 100%; max-width: 640px; max-height: 90vh; overflow-y: auto; }
-        .modal.large { max-width: 720px; }
+        .modal.large { max-width: 800px; }
         .modal-header { display: flex; justify-content: space-between; align-items: center; padding: 1.5rem; border-bottom: 1px solid var(--color-border); }
         .modal-header h2 { font-size: 1.25rem; font-weight: 600; }
         .close-btn { padding: 0.25rem; background: none; border: none; cursor: pointer; color: var(--color-text-tertiary); }

@@ -33,6 +33,10 @@ export interface Store {
     theme_color: string | null;
     accent_color: string | null;
     banner_url: string | null;
+    logo_url: string | null;
+    header_font: string | null;
+    body_font: string | null;
+    font_color: string | null;
     plan_id: string | null;
     created_at: string;
 }
@@ -62,6 +66,7 @@ export interface Product {
     name: string;
     description: string | null;
     price: number | null;
+    sale_price: number | null;
     price_type: 'fixed' | 'negotiable' | 'dm';
     is_visible: boolean;
     created_at: string;

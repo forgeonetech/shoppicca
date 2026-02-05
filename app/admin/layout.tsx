@@ -8,108 +8,108 @@ import { createClient } from '@/lib/supabase/client';
 import type { Store, Plan } from '@/lib/types/database';
 
 export default function AdminLayout({
-    children,
+  children,
 }: {
-    children: React.ReactNode;
+  children: React.ReactNode;
 }) {
-    const pathname = usePathname();
-    const router = useRouter();
-    const supabase = createClient();
-    const [store, setStore] = useState<Store | null>(null);
-    const [plan, setPlan] = useState<Plan | null>(null);
-    const [loading, setLoading] = useState(true);
-    const [sidebarOpen, setSidebarOpen] = useState(false);
+  const pathname = usePathname();
+  const router = useRouter();
+  const supabase = createClient();
+  const [store, setStore] = useState<Store | null>(null);
+  const [plan, setPlan] = useState<Plan | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
-    useEffect(() => {
-        const checkAuth = async () => {
-            const { data: { user } } = await supabase.auth.getUser();
+  useEffect(() => {
+    const checkAuth = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
 
-            if (!user) {
-                router.push('/auth/login');
-                return;
-            }
+      if (!user) {
+        router.push('/auth/login');
+        return;
+      }
 
-            // Fetch store data
-            const { data: storeData } = await supabase
-                .from('stores')
-                .select('*, plans(*)')
-                .eq('owner_id', user.id)
-                .maybeSingle();
+      // Fetch store data
+      const { data: storeData } = await supabase
+        .from('stores')
+        .select('*, plans(*)')
+        .eq('owner_id', user.id)
+        .maybeSingle();
 
-            if (!storeData) {
-                router.push('/onboarding');
-                return;
-            }
+      if (!storeData) {
+        router.push('/onboarding');
+        return;
+      }
 
-            setStore(storeData as Store);
-            setPlan(storeData.plans as Plan);
-            setLoading(false);
-        };
-
-        checkAuth();
-    }, [supabase, router]);
-
-    const handleLogout = async () => {
-        await supabase.auth.signOut();
-        router.push('/');
+      setStore(storeData as Store);
+      setPlan(storeData.plans as Plan);
+      setLoading(false);
     };
 
-    const navItems = [
-        {
-            href: '/admin',
-            label: 'Dashboard',
-            icon: (
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <rect x="3" y="3" width="7" height="7" />
-                    <rect x="14" y="3" width="7" height="7" />
-                    <rect x="14" y="14" width="7" height="7" />
-                    <rect x="3" y="14" width="7" height="7" />
-                </svg>
-            ),
-        },
-        {
-            href: '/admin/products',
-            label: 'Products',
-            icon: (
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z" />
-                    <line x1="3" y1="6" x2="21" y2="6" />
-                    <path d="M16 10a4 4 0 0 1-8 0" />
-                </svg>
-            ),
-        },
-        {
-            href: '/admin/categories',
-            label: 'Categories',
-            icon: (
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <line x1="8" y1="6" x2="21" y2="6" />
-                    <line x1="8" y1="12" x2="21" y2="12" />
-                    <line x1="8" y1="18" x2="21" y2="18" />
-                    <line x1="3" y1="6" x2="3.01" y2="6" />
-                    <line x1="3" y1="12" x2="3.01" y2="12" />
-                    <line x1="3" y1="18" x2="3.01" y2="18" />
-                </svg>
-            ),
-        },
-        {
-            href: '/admin/settings',
-            label: 'Settings',
-            icon: (
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <circle cx="12" cy="12" r="3" />
-                    <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z" />
-                </svg>
-            ),
-        },
-    ];
+    checkAuth();
+  }, [supabase, router]);
 
-    if (loading) {
-        return (
-            <div className="loading-screen">
-                <div className="spinner"></div>
-                <p>Loading your dashboard...</p>
-                <style jsx>{`
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
+    router.push('/');
+  };
+
+  const navItems = [
+    {
+      href: '/admin',
+      label: 'Dashboard',
+      icon: (
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <rect x="3" y="3" width="7" height="7" />
+          <rect x="14" y="3" width="7" height="7" />
+          <rect x="14" y="14" width="7" height="7" />
+          <rect x="3" y="14" width="7" height="7" />
+        </svg>
+      ),
+    },
+    {
+      href: '/admin/products',
+      label: 'Products',
+      icon: (
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z" />
+          <line x1="3" y1="6" x2="21" y2="6" />
+          <path d="M16 10a4 4 0 0 1-8 0" />
+        </svg>
+      ),
+    },
+    {
+      href: '/admin/categories',
+      label: 'Categories',
+      icon: (
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <line x1="8" y1="6" x2="21" y2="6" />
+          <line x1="8" y1="12" x2="21" y2="12" />
+          <line x1="8" y1="18" x2="21" y2="18" />
+          <line x1="3" y1="6" x2="3.01" y2="6" />
+          <line x1="3" y1="12" x2="3.01" y2="12" />
+          <line x1="3" y1="18" x2="3.01" y2="18" />
+        </svg>
+      ),
+    },
+    {
+      href: '/admin/settings',
+      label: 'Settings',
+      icon: (
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <circle cx="12" cy="12" r="3" />
+          <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z" />
+        </svg>
+      ),
+    },
+  ];
+
+  if (loading) {
+    return (
+      <div className="loading-screen">
+        <div className="spinner"></div>
+        <p>Loading your dashboard...</p>
+        <style jsx>{`
           .loading-screen {
             min-height: 100vh;
             display: flex;
@@ -120,98 +120,98 @@ export default function AdminLayout({
             background: var(--color-background-secondary);
           }
         `}</style>
-            </div>
-        );
-    }
+      </div>
+    );
+  }
 
-    return (
-        <div className="admin-layout">
-            {/* Mobile Header */}
-            <header className="mobile-header">
-                <button className="menu-btn" onClick={() => setSidebarOpen(true)}>
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                        <line x1="3" y1="12" x2="21" y2="12" />
-                        <line x1="3" y1="6" x2="21" y2="6" />
-                        <line x1="3" y1="18" x2="21" y2="18" />
-                    </svg>
-                </button>
-                <span className="header-title">{store?.name}</span>
-                <Link href={`/store/${store?.slug}`} className="view-store-btn" target="_blank">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                        <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
-                        <polyline points="15 3 21 3 21 9" />
-                        <line x1="10" y1="14" x2="21" y2="3" />
-                    </svg>
-                </Link>
-            </header>
+  return (
+    <div className="admin-layout">
+      {/* Mobile Header */}
+      <header className="mobile-header">
+        <button className="menu-btn" onClick={() => setSidebarOpen(true)}>
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <line x1="3" y1="12" x2="21" y2="12" />
+            <line x1="3" y1="6" x2="21" y2="6" />
+            <line x1="3" y1="18" x2="21" y2="18" />
+          </svg>
+        </button>
+        <span className="header-title">{store?.name}</span>
+        <Link href={`/store/${store?.slug}`} className="view-store-btn" target="_blank">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
+            <polyline points="15 3 21 3 21 9" />
+            <line x1="10" y1="14" x2="21" y2="3" />
+          </svg>
+        </Link>
+      </header>
 
-            {/* Sidebar Overlay */}
-            {sidebarOpen && (
-                <div className="sidebar-overlay" onClick={() => setSidebarOpen(false)} />
-            )}
+      {/* Sidebar Overlay */}
+      {sidebarOpen && (
+        <div className="sidebar-overlay" onClick={() => setSidebarOpen(false)} />
+      )}
 
-            {/* Sidebar */}
-            <aside className={`sidebar ${sidebarOpen ? 'open' : ''}`}>
-                <div className="sidebar-header">
-                    <Link href="/" className="logo" style={{ fontFamily: "'Cookie', cursive", fontWeight: 400, fontSize: '2rem', textDecoration: 'none' }}>Shoppicca</Link>
-                    <button className="close-btn" onClick={() => setSidebarOpen(false)}>
-                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                            <line x1="18" y1="6" x2="6" y2="18" />
-                            <line x1="6" y1="6" x2="18" y2="18" />
-                        </svg>
-                    </button>
-                </div>
+      {/* Sidebar */}
+      <aside className={`sidebar ${sidebarOpen ? 'open' : ''}`}>
+        <div className="sidebar-header">
+          <Link href="/" className="logo" style={{ fontFamily: "'Cookie', cursive", fontWeight: 400, fontSize: '2rem', textDecoration: 'none' }}>Shoppicca</Link>
+          <button className="close-btn" onClick={() => setSidebarOpen(false)}>
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <line x1="18" y1="6" x2="6" y2="18" />
+              <line x1="6" y1="6" x2="18" y2="18" />
+            </svg>
+          </button>
+        </div>
 
-                <div className="store-info">
-                    <div className="store-avatar">
-                        {store?.name?.charAt(0)}
-                    </div>
-                    <div className="store-details">
-                        <h3>{store?.name}</h3>
-                        <span className={`plan-badge ${plan?.name}`}>{plan?.name || 'Free'} Plan</span>
-                    </div>
-                </div>
+        <div className="store-info">
+          <div className="store-avatar">
+            {store?.name?.charAt(0)}
+          </div>
+          <div className="store-details">
+            <h3>{store?.name}</h3>
+            <span className={`plan-badge ${plan?.name}`}>{plan?.name || 'Free'} Plan</span>
+          </div>
+        </div>
 
-                <nav className="sidebar-nav">
-                    {navItems.map((item) => (
-                        <Link
-                            key={item.href}
-                            href={item.href}
-                            className={`nav-item ${pathname === item.href ? 'active' : ''}`}
-                            onClick={() => setSidebarOpen(false)}
-                        >
-                            {item.icon}
-                            <span>{item.label}</span>
-                        </Link>
-                    ))}
-                </nav>
+        <nav className="sidebar-nav">
+          {navItems.map((item) => (
+            <Link
+              key={item.href}
+              href={item.href}
+              className={`nav-item ${pathname === item.href ? 'active' : ''}`}
+              onClick={() => setSidebarOpen(false)}
+            >
+              {item.icon}
+              <span>{item.label}</span>
+            </Link>
+          ))}
+        </nav>
 
-                <div className="sidebar-footer">
-                    <Link href={`/store/${store?.slug}`} className="view-store-link" target="_blank">
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                            <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
-                            <polyline points="15 3 21 3 21 9" />
-                            <line x1="10" y1="14" x2="21" y2="3" />
-                        </svg>
-                        View Store
-                    </Link>
-                    <button className="logout-btn" onClick={handleLogout}>
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
-                            <polyline points="16 17 21 12 16 7" />
-                            <line x1="21" y1="12" x2="9" y2="12" />
-                        </svg>
-                        Log Out
-                    </button>
-                </div>
-            </aside>
+        <div className="sidebar-footer">
+          <Link href={`/store/${store?.slug}`} className="view-store-link" target="_blank">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
+              <polyline points="15 3 21 3 21 9" />
+              <line x1="10" y1="14" x2="21" y2="3" />
+            </svg>
+            View Store
+          </Link>
+          <button className="logout-btn" onClick={handleLogout}>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+              <polyline points="16 17 21 12 16 7" />
+              <line x1="21" y1="12" x2="9" y2="12" />
+            </svg>
+            Log Out
+          </button>
+        </div>
+      </aside>
 
-            {/* Main Content */}
-            <main className="main-content">
-                {children}
-            </main>
+      {/* Main Content */}
+      <main className="main-content">
+        {children}
+      </main>
 
-            <style jsx>{`
+      <style jsx>{`
         .admin-layout {
           min-height: 100vh;
           background: var(--color-background-secondary);
@@ -376,6 +376,12 @@ export default function AdminLayout({
           border-radius: var(--radius-md);
           transition: all var(--transition-fast);
           margin-bottom: 0.25rem;
+          white-space: nowrap; /* Prevent wrapping */
+        }
+
+        .nav-item svg {
+            display: block; /* Ensure no inline spacing */
+            flex-shrink: 0;
         }
 
         .nav-item:hover {
@@ -427,6 +433,6 @@ export default function AdminLayout({
           }
         }
       `}</style>
-        </div>
-    );
+    </div>
+  );
 }
